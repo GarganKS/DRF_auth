@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 # ВАШ ВАРІАНТ. Впишіть номер зі списку (1-16) — від нього залежать тести.
 # ---------------------------------------------------------------------------
-BOOKSTORE_VARIANT = 0
+BOOKSTORE_VARIANT = 8
 
 SECRET_KEY = "django-insecure-only-for-local-practice"
 DEBUG = True
