@@ -1,7 +1,10 @@
-from rest_framework import filters, permissions, viewsets
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
 
 from .models import Author, Book
-from .permissions import P1Permission
+from .permissions import IsBookOwner, P1Permission
 from .serializers import AuthorSerializer, BookSerializer
 
 
@@ -24,3 +27,29 @@ class BookViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         owner = self.request.user if self.request.user.is_authenticated else None
         serializer.save(owner=owner)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="cover",
+        parser_classes=[MultiPartParser],
+        permission_classes=[IsBookOwner],
+    )
+    def upload_cover(self, request, pk=None):
+        book = self.get_object()
+
+        cover = request.FILES.get("cover")
+
+        if not cover:
+            return Response(
+                {"detail": "Файл cover обов'язковий."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        book.cover = cover
+        book.save(update_fields=["cover"])
+
+        return Response(
+            {"cover": request.build_absolute_uri(book.cover.url)},
+            status=status.HTTP_200_OK,
+        )

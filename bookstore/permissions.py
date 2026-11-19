@@ -23,3 +23,8 @@ class P1Permission(BasePermission):
             return True
 
         return self.has_permission(request, view)
+
+
+class IsBookOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and obj.owner_id == request.user.id
